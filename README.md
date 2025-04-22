@@ -1,1 +1,1 @@
-# RDI_caluclator
+# RDI_calculator
