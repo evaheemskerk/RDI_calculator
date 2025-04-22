@@ -5,9 +5,9 @@ from process_data_sets import pre_process_data_set, make_outline_dataset, make_o
 from measurements import polarization_index, dispersion_index, peripheral_distribution_index
 from plotting import plot_RDI
 
-def cytoplasm_RDI(file_path_outline_files, file_name, nucleus, cytoplasm, resolution_z, resolution_xy, file_path_outline, file_path_cellpose_n, file_path_cellpose_c):
-    name_overlap_n = data_prep(file_path_cellpose_n, file_path_outline_files)
-    name_overlap_c = data_prep_cyto(file_path_cellpose_c, file_path_outline_files)
+def cytoplasm_RDI(file_name, nucleus, cytoplasm, resolution_z, resolution_xy, file_path_outline, file_path_cellpose_n, file_path_cellpose_c):
+    name_overlap_n = data_prep(file_path_cellpose_n, file_path_outline)
+    name_overlap_c = data_prep_cyto(file_path_cellpose_c, file_path_outline)
     name_overlap_df = pd.merge(name_overlap_n, name_overlap_c, on=["Donor", "TimePoint", "Type", "Sample"],
                                suffixes=('_n', '_c'))  # ff kijken of dit goed gaat?
 
@@ -88,7 +88,7 @@ if __name__ == '__main__':
     file_path_output = 'RDI_calculator_cytoplasm_TNF.xlsx'
 
     #Call main loop and save outcome
-    index_data = cytoplasm_RDI(file_path_outline_files, file_name, nucleus, cytoplasm, resolution_z, resolution_xy, file_path_outline_files,
+    index_data = cytoplasm_RDI(file_name, nucleus, cytoplasm, resolution_z, resolution_xy, file_path_outline_files,
                    file_path_cellpose_n, file_path_cellpose_c)    # #save PI_data in excel
     index_data.to_excel(file_path_output, index=False)
 
