@@ -12,6 +12,7 @@ If not; use the package manager [pip](https://pip.pypa.io/en/stable/) to install
 ```bash
 pip install numpy pandas seaborn tqdm imageio scipy.stats matplotlib.pyplot
 ```
+Download all the python files in this repository. 
 
 ## Inputs 
 Change the inputs at the bottom of the script. 
