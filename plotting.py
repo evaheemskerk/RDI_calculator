@@ -31,10 +31,8 @@ def plot_RDI(data):
                         y = data_tp[data_tp['Type'] == types[0]][index].values
 
 
-                    if len(x) > 0 and len(y) > 0:  # Alleen testen als beide groepen data hebben
+                    if len(x) > 0 and len(y) > 0:
                         stat, p_value = mannwhitneyu(x, y, alternative='two-sided')
-                        print(p_value)
-                        # 🔥 Betekenisvolheid aangeven met sterretjes
                         significance = 'n.s.'
                         if p_value < 0.05: significance = '*'
                         if p_value < 0.01: significance = '**'
@@ -98,10 +96,9 @@ def plot_RDI_nucleus(data):
                         y = data_tp[data_tp['Type'] == types[0]][index].values
 
 
-                    if len(x) > 0 and len(y) > 0:  # Alleen testen als beide groepen data hebben
+                    if len(x) > 0 and len(y) > 0:
                         stat, p_value = mannwhitneyu(x, y, alternative='two-sided')
                         print(p_value)
-                        # 🔥 Betekenisvolheid aangeven met sterretjes
                         significance = 'n.s.'
                         if p_value < 0.05: significance = '*'
                         if p_value < 0.01: significance = '**'
@@ -139,6 +136,9 @@ def plot_RDI_nucleus(data):
 
 if __name__ == '__main__':
     data = pd.read_excel('RDI_calculator_cytoplasm.xlsx')
+    clusters = pd.read_excel("C:/Users/Eva Heemskerk/Documents/Delft/TU Delft/MEP/4. Results/Control_clustering_code/Cytoplasm_cluster_control_data_minsamp3.xlsx")
+    clusters = clusters[clusters['P_value']<0.05]
+    data = data[data['Cell_Name'].isin(clusters['ID'])]
     data['Cytokines'] = data['Cytokines'].astype(str)
     data['Type'] = data['Type'].astype(str)
 
