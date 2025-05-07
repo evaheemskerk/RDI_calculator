@@ -22,6 +22,7 @@ Input parameters:
 * **cytoplasm** = Boolean set on True when interested in cytoplasm 
 * **resolution_z** = resolutioin in Z-axis
 * **resolution_xy** = resolution in XY-direction
+* * cytokine_analysis = Fill in BOTH if interested in both TNF and IFN, or fill in 'TNF' or 'IFN' when interested in a single analysis
   
 Input files:
 * **file_name** = File path to the Spots_with_localization.csv file
