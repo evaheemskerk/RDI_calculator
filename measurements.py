@@ -1,5 +1,4 @@
 import numpy as np
-
 def centroid(points):
     return np.mean(points, axis=0)
 
@@ -13,7 +12,6 @@ def radius_of_gyration(coordinates):
     return RG_cell
 
 def polarization_index(pixels, particles):
-    #print('centroid of particles =', centroid(particles))
     RG_cell = radius_of_gyration(pixels)
     pixels = np.array(pixels)
     particles = np.array(particles)
@@ -46,3 +44,11 @@ def peripheral_distribution_index(pixels_cyto, pixels_nucleus, particles):
     PDI = mu2 / mu2_prime
     return PDI
 
+if __name__ == '__main__':
+    pixels = [[0, 0, 1], [0, 0, 2], [0, 0, 0], [1, 0, 0], [1, 1, 0], [1, 2, 1], [1, 2, 2], [2, 2, 0], [1, 1, 2]]
+    particles = [[0, 0, 0], [2, 2, 0]]
+
+    PI = polarization_index(pixels, particles)
+    DI = dispersion_index(pixels, particles)
+    print(PI)
+    print(DI)
