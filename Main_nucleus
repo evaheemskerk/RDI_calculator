@@ -5,47 +5,52 @@ from measurements import polarization_index, dispersion_index
 from process_data_sets import pre_process_data_set, find_belonging_data_set, make_outline_dataset, find_cell_name, data_prep
 from plotting import plot_RDI_nucleus
 
-def nucleus_RDI(file_name, nucleus, cytoplasm, resolution_z, resolution_xy,file_path_cellpose, file_path_outline_files):
+def nucleus_RDI(file_name, nucleus, cytoplasm, resolution_z, resolution_xy,file_path_cellpose, file_path_outline_files, cytokine_analysis):
     name_overlap_df = data_prep(file_path_cellpose, file_path_outline_files)
 
     # initialize
     index_data = pd.DataFrame()
     for i in tqdm(range(len(name_overlap_df))):
-        timepoint = name_overlap_df.loc[i, 'TimePoint']
+        try:
+            timepoint = name_overlap_df.loc[i, 'TimePoint']
 
-        outline_file_path = f"{file_path_outline_files}/{timepoint}/FQ_outline/{name_overlap_df.loc[i, 'ID_outline']}"
-        file_path_tiff = f"{file_path_cellpose}/{name_overlap_df.loc[i, 'ID_cp']}"
+            outline_file_path = f"{file_path_outline_files}/{timepoint}/FQ_outline/{name_overlap_df.loc[i, 'ID_outline']}"
+            file_path_tiff = f"{file_path_cellpose}/{name_overlap_df.loc[i, 'ID_cp']}"
 
-        # find belonging cell names
-        outline_df = make_outline_dataset(outline_file_path)
-        cell_name_df, image = find_cell_name(file_path_tiff, outline_df)
+            # find belonging cell names
+            outline_df = make_outline_dataset(outline_file_path)
+            cell_name_df, image = find_cell_name(file_path_tiff, outline_df)
 
-        # find right data_set
-        data_set = pre_process_data_set(file_name, nucleus, cytoplasm, resolution_z, resolution_xy)
+            # find right data_set
+            data_set = pre_process_data_set(file_name, nucleus, cytoplasm, resolution_z, resolution_xy, cytokine_analysis)
 
-        parts = name_overlap_df.loc[i, 'ID_cp'].split('_')
-        cut_stack = int(parts[3])
+            parts = name_overlap_df.loc[i, 'ID_cp'].split('_')
+            # cut_stack = int(parts[3]) # THIS WAS FOR DATASET VALERIA
+            cut_stack = int(parts[5])  # THIS is FOR DATASET Zan
 
-        for cellname in cell_name_df['Cell_Name'].unique():
-            data, NAME = find_belonging_data_set(data_set, name_overlap_df.loc[i, 'ID_cp'], cellname)
-            # find inputs for the PI calculator
-            particles = data.iloc[:, [3, 4, 5]].values
-            cytokine = data['cytokine'].unique()
-            if len(particles) > 1:
-                intensity = cell_name_df.loc[cell_name_df["Cell_Name"] == cellname, "Intensity"].values[0]
-                pixels = np.argwhere(np.isin(image, intensity))
-                pixels[:, 0] = pixels[:, 0] * resolution_z + (cut_stack * 200)
-                pixels[:, 1] = pixels[:, 1] * resolution_xy
-                pixels[:, 2] = pixels[:, 2] * resolution_xy
+            for cellname in cell_name_df['Cell_Name'].unique():
+                data, NAME = find_belonging_data_set(data_set, name_overlap_df.loc[i, 'ID_cp'], cellname)
+                # find inputs for the PI calculator
+                particles = data.iloc[:, [3, 4, 5]].values
+                cytokine = data['cytokine'].unique()
+                if len(particles) > 1:
+                    intensity = cell_name_df.loc[cell_name_df["Cell_Name"] == cellname, "Intensity"].values[0]
+                    pixels = np.argwhere(np.isin(image, intensity))
+                    pixels[:, 0] = pixels[:, 0] * resolution_z + (cut_stack * resolution_z)
+                    pixels[:, 1] = pixels[:, 1] * resolution_xy
+                    pixels[:, 2] = pixels[:, 2] * resolution_xy
 
-                # print("After:", z[:,0][10:])
-                PI = polarization_index(pixels, particles)
-                DI = dispersion_index(pixels, particles)
-                new_row = {'Cell_Name': NAME, 'Donor': name_overlap_df.loc[i, 'Donor'],
-                           'TimePoint': name_overlap_df.loc[i, 'TimePoint'],
-                           'Type': name_overlap_df.loc[i, 'Type'], 'Cytokines': cytokine, 'PI': PI, 'DI': DI}
-                index_data = pd.concat([index_data, pd.DataFrame([new_row])], ignore_index=True)
-                #print(f'Cell "{cellname}" had a', PI, 'and a DI', DI)
+                    # print("After:", z[:,0][10:])
+                    PI = polarization_index(pixels, particles)
+                    DI = dispersion_index(pixels, particles)
+                    new_row = {'Cell_Name': NAME, 'Donor': name_overlap_df.loc[i, 'Donor'],
+                               'TimePoint': name_overlap_df.loc[i, 'TimePoint'],
+                               'Type': name_overlap_df.loc[i, 'Type'], 'Cytokines': cytokine, 'PI': PI, 'DI': DI}
+                    index_data = pd.concat([index_data, pd.DataFrame([new_row])], ignore_index=True)
+                    #print(f'Cell "{cellname}" had a', PI, 'and a DI', DI)
+        except:
+            print('Error in code, for image:', name_overlap_df.loc[i, 'ID_cp'])
+            print('Code is continued without this image')
 
     index_data['Cytokines'] = index_data['Cytokines'].astype(str)
     index_data['Type'] = index_data['Type'].astype(str)
@@ -59,14 +64,23 @@ if __name__ == '__main__':
     resolution_z = 200
     resolution_xy = 65
 
+    # Fill in BOTH if interested in both TNF and IFN, or fill in 'TNF' or 'IFN' when interested in a single analysis
+    cytokine_analysis = 'TNF'
+
     #filepaths
-    file_name = "F:/Eva/TryOuts/Spots_with_localization.csv"
-    file_path_cellpose = "F:/Eva/HuRKO_mask/Cellpose_DONE"
-    file_path_outline_files = "F:/Eva/Outline_files"
-    file_path_output = 'RDI_calculator_nucleus_TNF.xlsx'
+    # file_name = "F:/Eva/TryOuts/Spots_with_localization.csv"
+    # file_path_cellpose = "F:/Eva/HuRKO_mask/Cellpose_DONE"
+    # file_path_outline_files = "F:/Eva/Outline_files"
+    # file_path_output = 'RDI_calculator_nucleus_TNF.xlsx'
+
+    # filepaths ZAN
+    file_name = "F:/Eva/Data_Zan/Spots_with_localization.csv"
+    file_path_cellpose = "F:/Eva/Data_Zan/Zan_nucleus_data"
+    file_path_outline_files = "F:/Eva/Data_Zan/Outline_files"
+    file_path_output = 'F:/Eva/Data_Zan/Results/RDI/RDI_calculator_nucleus.xlsx'
 
     #Call main loop and save outcome
-    index_data = nucleus_RDI(file_name, nucleus, cytoplasm, resolution_z, resolution_xy, file_path_cellpose, file_path_outline_files)
+    index_data = nucleus_RDI(file_name, nucleus, cytoplasm, resolution_z, resolution_xy, file_path_cellpose, file_path_outline_files, cytokine_analysis)
     index_data.to_excel(file_path_output, index=False)
 
     #plotting the data
