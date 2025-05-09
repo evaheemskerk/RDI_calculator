@@ -1,5 +1,11 @@
-# RDI_calculator
-This algorithm allows you to find the three spatial localization indexes, proposed by Stueland _et al._ 
+# Spatial distribution using RDI-calculator
+This algorithm allows you to find the three spatial localization indexes in 3d, proposed by Stueland _et al._(2019) and based on formulas from Wang _et al._ (2019) and Park _et al._ (2012)
+
+Michael Stueland, Tianhong Wang, Hye Yoon Park, and Stavroula Mili. Rdi calculator: an analysis tool to assess rna distributions in cells. Scientific reports, 9(1):8267, 2019. 
+
+Tianhong Wang, Susan Hamilla, Maggie Cam, Helim Aranda-Espinoza, and Stavroula Mili. Extracellular matrix stiffness and cell contractility control rna localization to promote cell migration. Nature communications, 8(1):896, 2017.
+
+Hye Yoon Park, Tatjana Trcek, Amber L Wells, Jeffrey A Chao, and Robert H Singer. An unbiased analysis method to quantify mrna localization reveals its correlation with cell motility. Cell reports, 1(2):179–184, 2012.
 
 # Content
 * main_nucleus: run when interested in the nucleus
